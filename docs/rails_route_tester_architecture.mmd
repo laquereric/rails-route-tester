@@ -1,0 +1,134 @@
+graph TB
+    subgraph "Rails Route Tester Gem"
+        subgraph "Core Components"
+            RA[RouteAnalyzer]
+            TF[TestFinder]
+            Config[Configuration]
+        end
+        
+        subgraph "Generators"
+            PG[PomGenerator]
+            RG[RspecGenerator]
+            CG[CucumberGenerator]
+        end
+        
+        subgraph "Rake Tasks"
+            RT[routes.rake]
+            PT[pom.rake]
+            TT[tests.rake]
+        end
+        
+        subgraph "Generated Files"
+            subgraph "Page Objects"
+                BP[BasePage]
+                POM1[UserIndexPage]
+                POM2[UserShowPage]
+                POM3[...]
+            end
+            
+            subgraph "RSpec Tests"
+                RS1[user_index_spec.rb]
+                RS2[user_show_spec.rb]
+                RS3[...]
+                RH[rails_helper.rb]
+                FH[feature_helper.rb]
+            end
+            
+            subgraph "Cucumber Tests"
+                CF1[user_index.feature]
+                CF2[user_show.feature]
+                CS1[user_index_steps.rb]
+                CS2[user_show_steps.rb]
+                ENV[env.rb]
+                WE[world_extensions.rb]
+            end
+        end
+    end
+    
+    subgraph "Rails Application"
+        Routes[Rails Routes]
+        Controllers[Controllers]
+        Models[Models]
+        Views[Views]
+    end
+    
+    subgraph "Testing Frameworks"
+        RSpec[RSpec]
+        Cucumber[Cucumber]
+        Capybara[Capybara]
+        FactoryBot[FactoryBot]
+    end
+    
+    %% Core component relationships
+    RA --> Routes
+    TF --> RA
+    Config --> PG
+    Config --> RG
+    Config --> CG
+    
+    %% Generator relationships
+    PG --> BP
+    PG --> POM1
+    PG --> POM2
+    PG --> POM3
+    
+    RG --> PG
+    RG --> RS1
+    RG --> RS2
+    RG --> RS3
+    RG --> RH
+    RG --> FH
+    
+    CG --> PG
+    CG --> CF1
+    CG --> CF2
+    CG --> CS1
+    CG --> CS2
+    CG --> ENV
+    CG --> WE
+    
+    %% Rake task relationships
+    RT --> RA
+    RT --> TF
+    PT --> PG
+    TT --> RG
+    TT --> CG
+    
+    %% Testing framework integration
+    BP --> Capybara
+    RS1 --> RSpec
+    RS1 --> POM1
+    RS2 --> RSpec
+    RS2 --> POM2
+    
+    CF1 --> Cucumber
+    CS1 --> Cucumber
+    CS1 --> POM1
+    CS2 --> POM2
+    
+    RH --> FactoryBot
+    ENV --> FactoryBot
+    
+    %% Application integration
+    Controllers --> Routes
+    Models --> Controllers
+    Views --> Controllers
+    
+    classDef coreClass fill:#e1f5fe
+    classDef generatorClass fill:#f3e5f5
+    classDef rakeClass fill:#e8f5e8
+    classDef pomClass fill:#fff3e0
+    classDef rspecClass fill:#fce4ec
+    classDef cucumberClass fill:#e0f2f1
+    classDef railsClass fill:#f1f8e9
+    classDef testClass fill:#fafafa
+    
+    class RA,TF,Config coreClass
+    class PG,RG,CG generatorClass
+    class RT,PT,TT rakeClass
+    class BP,POM1,POM2,POM3 pomClass
+    class RS1,RS2,RS3,RH,FH rspecClass
+    class CF1,CF2,CS1,CS2,ENV,WE cucumberClass
+    class Routes,Controllers,Models,Views railsClass
+    class RSpec,Cucumber,Capybara,FactoryBot testClass
+
