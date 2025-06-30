@@ -160,9 +160,12 @@ module RailsRouteTester
             context "when there are no #{route[:controller]}" do
               it "displays an empty state message" do
                 page_object.visit_page
+                capture_test_step("after_visit_page")
                 
                 expect(page_object).to be_loaded
+                capture_test_step("after_loaded_check")
                 expect(page_object).to have_correct_title
+                capture_test_step("after_title_check")
                 # Add specific assertions for empty state
               end
             end
@@ -174,19 +177,26 @@ module RailsRouteTester
 
               it "displays the list of #{route[:controller]}" do
                 page_object.visit_page
+                capture_test_step("after_visit_page")
                 
                 expect(page_object).to be_loaded
+                capture_test_step("after_loaded_check")
                 expect(page_object).to have_items
+                capture_test_step("after_items_check")
                 expect(page_object.list_items.count).to eq(3)
+                capture_test_step("after_count_check")
               end
 
               it "allows searching through #{route[:controller]}" do
                 searchable_item = create(:#{route[:controller].singularize}, name: "Searchable Item")
                 page_object.visit_page
+                capture_test_step("after_visit_page")
                 
                 page_object.search_for("Searchable")
+                capture_test_step("after_search")
                 
                 expect(page_object).to have_text("Searchable Item")
+                capture_test_step("after_search_verification")
               end
             end
           end
@@ -198,22 +208,22 @@ module RailsRouteTester
           describe "viewing a #{route[:controller].singularize}" do
             it "displays the #{route[:controller].singularize} details" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
               expect(page_object).to be_loaded
+              capture_test_step("after_loaded_check")
               expect(page_object).to have_correct_title
-              # Add specific assertions for the show page
+              capture_test_step("after_title_check")
+              # Add specific assertions for #{route[:controller].singularize} details
             end
 
-            it "provides navigation options" do
+            it "shows all required #{route[:controller].singularize} information" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
-              expect(page_object).to have_edit_link
-              # Add other navigation assertions
-            end
-
-            it "allows taking screenshots for documentation", :screenshot do
-              page_object.visit_page
-              page_object.take_screenshot("#{route[:controller]}_#{route[:action]}")
+              # Add specific assertions for #{route[:controller].singularize} information
+              expect(page_object).to have_content(#{route[:controller].singularize}.name)
+              capture_test_step("after_content_check")
             end
           end
         RUBY
@@ -221,21 +231,25 @@ module RailsRouteTester
 
       def generate_new_scenarios(route)
         <<~RUBY
-          describe "creating a new #{route[:controller].singularize}" do
-            it "displays the new #{route[:controller].singularize} form" do
+          describe "accessing the new #{route[:controller].singularize} form" do
+            it "displays the form correctly" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
               expect(page_object).to be_loaded
-              expect(page_object).to have_correct_title
-              expect(page_object.form).to be_present
+              capture_test_step("after_loaded_check")
+              expect(page_object).to have_form
+              capture_test_step("after_form_check")
+              # Add specific form field assertions
             end
 
-            it "allows canceling the creation" do
+            it "shows all required form fields" do
               page_object.visit_page
-              page_object.cancel
+              capture_test_step("after_visit_page")
               
-              # Assert navigation back to appropriate page
-              expect(current_path).not_to eq(page_object.class.path)
+              # Add specific field assertions
+              expect(page_object).to have_submit_button
+              capture_test_step("after_fields_check")
             end
           end
         RUBY
@@ -243,26 +257,33 @@ module RailsRouteTester
 
       def generate_create_scenarios(route)
         <<~RUBY
-          describe "creating a #{route[:controller].singularize}" do
-            it "successfully creates a new #{route[:controller].singularize} with valid data" do
+          describe "creating a new #{route[:controller].singularize}" do
+            it "successfully creates a #{route[:controller].singularize} with valid data" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
-              valid_attributes = attributes_for(:#{route[:controller].singularize})
-              page_object.fill_form(valid_attributes)
-              page_object.submit_form
+              expect {
+                page_object.fill_form_with_valid_data
+                capture_test_step("after_fill_form")
+                page_object.submit_form
+                capture_test_step("after_submit_form")
+              }.to change(#{route[:controller].singularize.camelize}, :count).by(1)
               
               expect(page_object).to have_flash_message(:success)
-              # Add assertions for successful creation
+              capture_test_step("after_success_check")
             end
 
-            it "displays errors with invalid data" do
+            it "shows validation errors with invalid data" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
-              page_object.fill_form({}) # Empty form
+              page_object.fill_form_with_invalid_data
+              capture_test_step("after_fill_invalid_form")
               page_object.submit_form
+              capture_test_step("after_submit_invalid_form")
               
-              expect(page_object).to have_flash_message(:error)
-              # Add assertions for validation errors
+              expect(page_object).to have_validation_errors
+              capture_test_step("after_validation_check")
             end
           end
         RUBY
@@ -271,19 +292,26 @@ module RailsRouteTester
       def generate_edit_scenarios(route)
         <<~RUBY
           describe "editing a #{route[:controller].singularize}" do
-            it "displays the edit form with current values" do
+            it "displays the edit form with current data" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
               expect(page_object).to be_loaded
-              expect(page_object).to have_correct_title
-              expect(page_object.form).to be_present
+              capture_test_step("after_loaded_check")
+              expect(page_object).to have_form
+              capture_test_step("after_form_check")
+              expect(page_object).to have_prefilled_data
+              capture_test_step("after_prefilled_check")
             end
 
             it "allows canceling the edit" do
               page_object.visit_page
-              page_object.cancel
+              capture_test_step("after_visit_page")
               
-              # Assert navigation back to show page or index
+              page_object.cancel
+              capture_test_step("after_cancel")
+              
+              # Assert navigation back to appropriate page
               expect(current_path).not_to eq(page_object.class.path)
             end
           end
@@ -294,24 +322,32 @@ module RailsRouteTester
         <<~RUBY
           describe "updating a #{route[:controller].singularize}" do
             it "successfully updates with valid data" do
+              original_name = #{route[:controller].singularize}.name
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
-              updated_attributes = { name: "Updated Name" }
-              page_object.update_form(updated_attributes)
+              page_object.fill_form_with_valid_data
+              capture_test_step("after_fill_form")
               page_object.submit_form
+              capture_test_step("after_submit_form")
               
               expect(page_object).to have_flash_message(:success)
-              # Add assertions for successful update
+              capture_test_step("after_success_check")
+              expect(#{route[:controller].singularize}.reload.name).not_to eq(original_name)
+              capture_test_step("after_update_verification")
             end
 
-            it "displays errors with invalid data" do
+            it "shows validation errors with invalid data" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
-              page_object.update_form({ name: "" }) # Invalid data
+              page_object.fill_form_with_invalid_data
+              capture_test_step("after_fill_invalid_form")
               page_object.submit_form
+              capture_test_step("after_submit_invalid_form")
               
-              expect(page_object).to have_flash_message(:error)
-              # Add assertions for validation errors
+              expect(page_object).to have_validation_errors
+              capture_test_step("after_validation_check")
             end
           end
         RUBY
@@ -322,14 +358,26 @@ module RailsRouteTester
           describe "deleting a #{route[:controller].singularize}" do
             it "successfully deletes the #{route[:controller].singularize}" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
               expect {
-                page_object.click_delete
-                # Handle confirmation dialog if present
-                page.driver.browser.switch_to.alert.accept if page.driver.browser.switch_to.alert rescue nil
+                page_object.confirm_delete
+                capture_test_step("after_confirm_delete")
               }.to change(#{route[:controller].singularize.camelize}, :count).by(-1)
               
               expect(page_object).to have_flash_message(:success)
+              capture_test_step("after_success_check")
+            end
+
+            it "allows canceling the deletion" do
+              page_object.visit_page
+              capture_test_step("after_visit_page")
+              
+              page_object.cancel_delete
+              capture_test_step("after_cancel_delete")
+              
+              expect(#{route[:controller].singularize.camelize}.count).to eq(1)
+              capture_test_step("after_cancel_verification")
             end
           end
         RUBY
@@ -340,22 +388,29 @@ module RailsRouteTester
           describe "#{route[:action]} action" do
             it "loads the page successfully" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
               expect(page_object).to be_loaded
+              capture_test_step("after_loaded_check")
               expect(page_object).to have_correct_title
+              capture_test_step("after_title_check")
             end
 
             it "displays the correct content" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
               # Add specific assertions for this action
               expect(page).to have_content("#{route[:controller].humanize}")
+              capture_test_step("after_content_check")
             end
 
             it "maintains proper navigation" do
               page_object.visit_page
+              capture_test_step("after_visit_page")
               
               expect(page_object.navigation).to be_present
+              capture_test_step("after_navigation_check")
             end
           end
         RUBY
@@ -472,6 +527,7 @@ module RailsRouteTester
       def feature_helper_content
         <<~RUBY
           # Feature test helper methods and configurations
+          require 'rails_route_tester/test_capture_helper'
 
           module FeatureHelper
             def sign_in_user(user = nil)
@@ -511,10 +567,45 @@ module RailsRouteTester
             rescue
               # No dialog present
             end
+
+            # Test capture methods
+            def capture_test_step(step_name = nil)
+              example_name = RSpec.current_example&.full_description || "unknown_test"
+              RailsRouteTester::TestCaptureHelper.capture_test_results(example_name, step_name)
+            end
+
+            def capture_after_each_step
+              example_name = RSpec.current_example&.full_description || "unknown_test"
+              RailsRouteTester::TestCaptureHelper.capture_test_results(example_name, "after_step")
+            end
           end
 
           RSpec.configure do |config|
             config.include FeatureHelper, type: :feature
+
+            # Capture test results after each step
+            config.after(:each, type: :feature) do |example|
+              if example.exception
+                # Capture on failure
+                capture_test_step("failure")
+              else
+                # Capture on success
+                capture_test_step("success")
+              end
+            end
+
+            # Capture test results before each step (for debugging)
+            config.before(:each, type: :feature) do |example|
+              # Only capture if explicitly requested via metadata
+              if example.metadata[:capture_steps]
+                capture_test_step("before_step")
+              end
+            end
+
+            # Cleanup old test results (keep last 7 days)
+            config.after(:suite) do
+              RailsRouteTester::TestCaptureHelper.cleanup_old_results(7)
+            end
           end
         RUBY
       end

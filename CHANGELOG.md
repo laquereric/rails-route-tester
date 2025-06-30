@@ -62,6 +62,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `tests:run_all` - Run complete test suite
 - `tests:cleanup` - Remove unused test files
 
+#### Test Capture and Results Management
+- **Automatic HTML and PNG capture**: Captures page state at every test step
+- **Results directory structure**: Organized storage in `route_tests_results` directory
+- **Metadata overlay**: HTML files include visible test information overlay
+- **Timestamped directories**: Unique directories for each test execution
+- **Browser information capture**: User agent, window size, and other browser details
+- **Automatic cleanup**: Old test results cleaned up after 7 days
+- **Results management rake tasks**:
+  - `results:list` - List all test result directories
+  - `results:show[test_id]` - Show details for specific test result
+  - `results:report` - Generate summary report
+  - `results:open` - Open results directory in file explorer
+  - `results:cleanup[days]` - Clean up old results
+
 #### Configuration System
 - Configurable base paths for POMs, RSpec tests, and Cucumber features
 - Test framework preference setting

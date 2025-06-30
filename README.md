@@ -11,6 +11,8 @@ A comprehensive Ruby gem that provides Rake tasks for Rails applications to anal
 - **Test Coverage Analysis**: Track which routes have tests
 - **Bulk Operations**: Generate tests and POMs for all routes at once
 - **Cleanup Tools**: Remove unused test files and POMs
+- **Test Capture**: Automatically capture HTML and PNG files at every test step
+- **Results Management**: Comprehensive tools for managing and viewing test results
 
 ## Installation
 
@@ -65,6 +67,29 @@ RailsRouteTester.configure do |config|
   config.features_base_path = "features"
   config.test_framework = :rspec # or :cucumber
 end
+```
+
+### Test Capture Configuration
+
+The test capture functionality is automatically enabled for all generated tests. You can customize the behavior by adding these options to your test configuration:
+
+```ruby
+# In spec/rails_helper.rb or features/support/env.rb
+RSpec.configure do |config|
+  # Enable step-by-step capture for debugging (optional)
+  config.before(:each, type: :feature, capture_steps: true) do |example|
+    capture_test_step("before_step")
+  end
+end
+```
+
+For Cucumber, capture is automatically enabled for all steps. You can disable it for specific scenarios by adding a tag:
+
+```gherkin
+@no_capture
+Scenario: This scenario won't capture results
+  Given I visit the users index page
+  Then I should see the users list
 ```
 
 ## Available Rake Tasks
@@ -150,6 +175,58 @@ rake tests:run_all
 # Clean up unused test files
 rake tests:cleanup
 ```
+
+### Test Results Management
+
+```bash
+# List all test result directories
+rake results:list
+
+# Show details for a specific test result
+rake results:show[test_id]
+
+# Generate test results summary report
+rake results:report
+
+# Open test results directory in file explorer
+rake results:open
+
+# Clean up old test results (default: 7 days)
+rake results:cleanup[days]
+```
+
+## Test Capture and Results
+
+The gem automatically captures HTML and PNG files at every test step, storing them in the `route_tests_results` directory. Each test execution creates a unique directory with:
+
+- **HTML files**: Complete page HTML with metadata overlay
+- **PNG screenshots**: Full-page screenshots at each step
+- **Metadata files**: JSON files with test information, timestamps, and browser details
+
+### Generated File Structure
+
+```
+route_tests_results/
+├── test_name_20250101_120000_123/
+│   ├── test_name_20250101_120000_123_after_visit_page.html
+│   ├── test_name_20250101_120000_123_after_visit_page.png
+│   ├── test_name_20250101_120000_123_after_loaded_check.html
+│   ├── test_name_20250101_120000_123_after_loaded_check.png
+│   ├── test_name_20250101_120000_123_metadata.json
+│   └── ...
+├── another_test_20250101_120100_456/
+│   └── ...
+└── ...
+```
+
+### Test Capture Features
+
+- **Automatic capture**: HTML and PNG files captured at every test step
+- **Metadata overlay**: HTML files include visible metadata overlay with test information
+- **Timestamped directories**: Each test run gets a unique timestamped directory
+- **Browser information**: Captures user agent, window size, and other browser details
+- **Automatic cleanup**: Old test results automatically cleaned up after 7 days
+- **Cross-platform**: Works on Windows, macOS, and Linux
 
 ## Generated File Structure
 
@@ -317,6 +394,7 @@ Feature: Users Index
 - **RSpec**: ~> 3.0 (for RSpec test generation)
 - **Cucumber**: ~> 7.0 (for Cucumber test generation)
 - **Capybara**: For page interaction in tests
+- **Selenium WebDriver**: For screenshot capture (automatically included with Capybara)
 
 ## Development
 

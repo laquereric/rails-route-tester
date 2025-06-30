@@ -383,84 +383,114 @@ module RailsRouteTester
         pom_class_name = "#{route[:controller].camelize}#{route[:action].camelize}Page"
         
         <<~RUBY
-          # Navigation steps
-          When(/^I visit the #{route[:controller]} #{route[:action]} page$/) do
-            @page = #{pom_class_name}.new
-            @page.visit_page
+          # Navigation steps for #{route[:controller]} #{route[:action]}
+          Given("I visit the #{route[:controller]} #{route[:action]} page") do
+            @page_object = #{pom_class_name}.new
+            @page_object.visit_page
+            capture_cucumber_step("visit_#{route[:controller]}_#{route[:action]}")
           end
 
-          When(/^I visit the #{route[:controller].singularize} #{route[:action]} page$/) do
-            @page = #{pom_class_name}.new
-            @page.visit_page
+          When("I navigate to the #{route[:controller]} #{route[:action]} page") do
+            @page_object = #{pom_class_name}.new
+            @page_object.visit_page
+            capture_cucumber_step("navigate_to_#{route[:controller]}_#{route[:action]}")
+          end
+
+          Then("I should be on the #{route[:controller]} #{route[:action]} page") do
+            expect(@page_object).to be_loaded
+            capture_cucumber_step("verify_#{route[:controller]}_#{route[:action]}_loaded")
           end
         RUBY
       end
 
       def generate_interaction_steps(route)
         steps = []
-
+        
         case route[:action]
         when 'index'
           steps << <<~RUBY
-            When(/^I search for "([^"]*)"$/) do |term|
-              @page.search_for(term)
+            # Index page interactions
+            When("I search for {string} in the #{route[:controller]} list") do |search_term|
+              @page_object.search_for(search_term)
+              capture_cucumber_step("search_#{route[:controller]}")
             end
 
-            When(/^I click the "([^"]*)" #{route[:controller].singularize}$/) do |name|
-              # Find and click the specific item
-              @page.click_item_by_name(name)
+            When("I click on the first #{route[:controller].singularize} in the list") do
+              @page_object.click_item(0)
+              capture_cucumber_step("click_first_#{route[:controller].singularize}")
+            end
+
+            When("I click on the new #{route[:controller].singularize} link") do
+              @page_object.click_new_link
+              capture_cucumber_step("click_new_#{route[:controller].singularize}_link")
             end
           RUBY
-        when 'new', 'create', 'edit', 'update'
+        when 'show'
           steps << <<~RUBY
-            When(/^I fill in the #{route[:controller].singularize} form with valid data$/) do
-              @form_data = {
-                name: "Test #{route[:controller].singularize.humanize}",
-                description: "Test description for #{route[:controller].singularize}"
-              }
-              @page.fill_form(@form_data)
+            # Show page interactions
+            When("I click the edit #{route[:controller].singularize} link") do
+              @page_object.click_edit_link
+              capture_cucumber_step("click_edit_#{route[:controller].singularize}_link")
             end
 
-            When(/^I fill in the #{route[:controller].singularize} form with invalid data$/) do
-              @form_data = {
-                name: "", # Invalid: empty name
-                description: "x" * 1000 # Invalid: too long
-              }
-              @page.fill_form(@form_data)
+            When("I click the delete #{route[:controller].singularize} link") do
+              @page_object.click_delete_link
+              capture_cucumber_step("click_delete_#{route[:controller].singularize}_link")
             end
 
-            When(/^I submit the form$/) do
-              @page.submit_form
+            When("I confirm the deletion") do
+              accept_confirm_dialog
+              capture_cucumber_step("confirm_deletion")
             end
 
-            When(/^I click the cancel button$/) do
-              @page.cancel
-            end
-
-            When(/^I change the name to "([^"]*)"$/) do |new_name|
-              @page.update_form(name: new_name)
-            end
-
-            When(/^I clear the name field$/) do
-              @page.update_form(name: "")
+            When("I cancel the deletion") do
+              dismiss_confirm_dialog
+              capture_cucumber_step("cancel_deletion")
             end
           RUBY
-        when 'show', 'destroy'
+        when 'new', 'create'
           steps << <<~RUBY
-            When(/^I click the edit link$/) do
-              @page.click_edit
+            # New/Create page interactions
+            When("I fill in the #{route[:controller].singularize} form with valid data") do
+              @page_object.fill_form_with_valid_data
+              capture_cucumber_step("fill_valid_#{route[:controller].singularize}_form")
             end
 
-            When(/^I click the delete button$/) do
-              @page.click_delete
+            When("I fill in the #{route[:controller].singularize} form with invalid data") do
+              @page_object.fill_form_with_invalid_data
+              capture_cucumber_step("fill_invalid_#{route[:controller].singularize}_form")
             end
 
-            When(/^I confirm the deletion$/) do
-              accept_confirm
+            When("I submit the #{route[:controller].singularize} form") do
+              @page_object.submit_form
+              capture_cucumber_step("submit_#{route[:controller].singularize}_form")
             end
 
-            When(/^I cancel the deletion$/) do
-              dismiss_confirm
+            When("I cancel the #{route[:controller].singularize} form") do
+              @page_object.cancel
+              capture_cucumber_step("cancel_#{route[:controller].singularize}_form")
+            end
+          RUBY
+        when 'edit', 'update'
+          steps << <<~RUBY
+            # Edit/Update page interactions
+            When("I update the #{route[:controller].singularize} with valid data") do
+              @page_object.fill_form_with_valid_data
+              capture_cucumber_step("fill_valid_update_#{route[:controller].singularize}_form")
+              @page_object.submit_form
+              capture_cucumber_step("submit_update_#{route[:controller].singularize}_form")
+            end
+
+            When("I update the #{route[:controller].singularize} with invalid data") do
+              @page_object.fill_form_with_invalid_data
+              capture_cucumber_step("fill_invalid_update_#{route[:controller].singularize}_form")
+              @page_object.submit_form
+              capture_cucumber_step("submit_invalid_update_#{route[:controller].singularize}_form")
+            end
+
+            When("I cancel the #{route[:controller].singularize} update") do
+              @page_object.cancel
+              capture_cucumber_step("cancel_update_#{route[:controller].singularize}")
             end
           RUBY
         end
@@ -470,31 +500,40 @@ module RailsRouteTester
 
       def generate_verification_steps(route)
         <<~RUBY
-          # Verification steps
-          Then(/^I should see the #{route[:controller]} #{route[:action]} content$/) do
-            expect(@page).to be_loaded
-            expect(@page).to have_correct_title
+          # Verification steps for #{route[:controller]} #{route[:action]}
+          Then("I should see the #{route[:controller]} #{route[:action]} page") do
+            expect(@page_object).to be_loaded
+            capture_cucumber_step("verify_#{route[:controller]}_#{route[:action]}_page_loaded")
           end
 
-          Then(/^I should see the #{route[:controller].singularize} #{route[:action]} content$/) do
-            expect(@page).to be_loaded
-            expect(@page).to have_correct_title
+          Then("I should see the correct page title") do
+            expect(@page_object).to have_correct_title
+            capture_cucumber_step("verify_page_title")
           end
 
-          Then(/^I should see a success message$/) do
-            expect(@page).to have_flash_message(:success)
+          Then("I should see a success message") do
+            expect(@page_object).to have_flash_message(:success)
+            capture_cucumber_step("verify_success_message")
           end
 
-          Then(/^I should see validation error messages$/) do
-            expect(@page).to have_flash_message(:error)
+          Then("I should see an error message") do
+            expect(@page_object).to have_flash_message(:error)
+            capture_cucumber_step("verify_error_message")
           end
 
-          Then(/^I should see "([^"]*)" in the title$/) do |text|
-            expect(page).to have_css('h1', text: text)
+          Then("I should see validation errors") do
+            expect(@page_object).to have_validation_errors
+            capture_cucumber_step("verify_validation_errors")
           end
 
-          Then(/^I take a screenshot for documentation$/) do
-            @page.take_screenshot("#{route[:controller]}_#{route[:action]}")
+          Then("I should be redirected to the #{route[:controller]} index page") do
+            expect(current_path).to eq(#{route[:controller]}_path)
+            capture_cucumber_step("verify_redirect_to_#{route[:controller]}_index")
+          end
+
+          Then("I should be redirected to the #{route[:controller].singularize} show page") do
+            expect(current_path).to eq(#{route[:controller].singularize}_path(#{route[:controller].singularize}))
+            capture_cucumber_step("verify_redirect_to_#{route[:controller].singularize}_show")
           end
         RUBY
       end
@@ -559,42 +598,87 @@ module RailsRouteTester
         <<~RUBY
           require 'cucumber/rails'
           require 'capybara/cucumber'
-          require 'capybara/rails'
+          require 'capybara/rspec'
+          require 'factory_bot_rails'
+          require 'rails_route_tester/test_capture_helper'
 
-          # Capybara defaults to CSS3 selectors rather than XPath.
-          Capybara.default_selector = :css
-
-          # By default, any exception happening in your Rails application will bubble up
-          # to Cucumber so that your scenario will fail. This is a different from how
-          # your application behaves in the production environment, where an error page will
-          # be rendered instead.
-          ActionController::Base.allow_rescue = false
-
-          # Remove/comment out the lines below if your app doesn't have a database.
-          begin
-            DatabaseCleaner.strategy = :transaction
-          rescue NameError
-            raise "You need to add database_cleaner to your Gemfile (in the :test group) if you wish to use it."
-          end
-
-          # You may also want to configure DatabaseCleaner to use different strategies for certain features and scenarios.
-          Cucumber::Rails::Database.javascript_strategy = :truncation
-
-          # Configure Capybara
+          # Capybara configuration
           Capybara.default_driver = :rack_test
           Capybara.javascript_driver = :selenium_chrome_headless
           Capybara.default_max_wait_time = 5
 
-          # Screenshot configuration
+          # Database cleanup
+          Before do
+            DatabaseCleaner.start
+          end
+
           After do |scenario|
+            DatabaseCleaner.clean
+            
+            # Capture test results after each scenario
             if scenario.failed?
-              screenshot_name = scenario.name.gsub(/[^A-Za-z0-9]/, '_').downcase
-              page.save_screenshot("tmp/screenshots/\#{screenshot_name}_\#{Time.current.to_i}.png")
+              capture_cucumber_step(scenario.name, "failure")
+            else
+              capture_cucumber_step(scenario.name, "success")
             end
+          end
+
+          # Capture test results after each step
+          AfterStep do |scenario, step|
+            capture_cucumber_step(scenario.name, step.name)
+          end
+
+          # Helper methods for test capture
+          def capture_cucumber_step(scenario_name, step_name = nil)
+            RailsRouteTester::TestCaptureHelper.capture_test_results(scenario_name, step_name)
+          end
+
+          # Cleanup old test results (keep last 7 days)
+          at_exit do
+            RailsRouteTester::TestCaptureHelper.cleanup_old_results(7)
           end
 
           # World extensions
           World(FactoryBot::Syntax::Methods) if defined?(FactoryBot)
+
+          # Custom step definitions helpers
+          def sign_in_user(user = nil)
+            user ||= create(:user)
+            # Implement your authentication logic here
+            # Example for Devise:
+            # login_as(user, scope: :user)
+            user
+          end
+
+          def sign_out_user
+            # Implement your sign out logic here
+            # Example for Devise:
+            # logout(:user)
+          end
+
+          def wait_for_ajax
+            Timeout.timeout(Capybara.default_max_wait_time) do
+              loop until finished_all_ajax_requests?
+            end
+          end
+
+          def finished_all_ajax_requests?
+            page.evaluate_script('jQuery.active').zero?
+          rescue
+            true
+          end
+
+          def accept_confirm_dialog
+            page.driver.browser.switch_to.alert.accept
+          rescue
+            # No dialog present
+          end
+
+          def dismiss_confirm_dialog
+            page.driver.browser.switch_to.alert.dismiss
+          rescue
+            # No dialog present
+          end
         RUBY
       end
 

@@ -1,6 +1,7 @@
 require "rails_route_tester/version"
 require "rails_route_tester/route_analyzer"
 require "rails_route_tester/test_finder"
+require "rails_route_tester/test_capture_helper"
 require "rails_route_tester/generators/pom_generator"
 require "rails_route_tester/generators/rspec_generator"
 require "rails_route_tester/generators/cucumber_generator"
