@@ -346,7 +346,7 @@ The gem is available as open source under the terms of the [MIT License](LICENSE
 
 ## Support
 
-For questions, issues, or contributions, please visit our [GitHub repository](https://github.com/railsroutetester/rails_route_tester).
+For questions, issues, or contributions, please visit our [GitHub repository](https://github.com/rails-route-tester/rails-route-tester).
 
 ## Changelog
 
