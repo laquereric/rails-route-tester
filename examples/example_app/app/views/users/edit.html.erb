@@ -1,0 +1,61 @@
+<div class="page-header">
+  <div class="header-content">
+    <h1>Edit <%= @user.name %></h1>
+    <div class="header-actions">
+      <%= link_to "View User", user_path(@user), class: "btn btn-secondary" %>
+    </div>
+  </div>
+</div>
+
+<div class="form-container">
+  <%= form_with model: @user, local: true, class: "user-form" do |form| %>
+    <% if @user.errors.any? %>
+      <div class="error-messages">
+        <h3><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h3>
+        <ul>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="form-section">
+      <h3>Basic Information</h3>
+      
+      <div class="form-group">
+        <%= form.label :name, "Full Name", class: "form-label" %>
+        <%= form.text_field :name, class: "form-input", placeholder: "Enter full name" %>
+      </div>
+
+      <div class="form-group">
+        <%= form.label :email, "Email Address", class: "form-label" %>
+        <%= form.email_field :email, class: "form-input", placeholder: "Enter email address" %>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Profile Information</h3>
+      
+      <div class="form-group">
+        <%= form.label :bio, "Bio", class: "form-label" %>
+        <%= form.text_area :bio, 
+            rows: 4, 
+            class: "form-textarea", 
+            placeholder: "Tell us about yourself..." %>
+        <small class="form-help">Maximum 500 characters</small>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <%= form.submit "Update User", class: "btn btn-primary" %>
+      <%= link_to "Cancel", user_path(@user), class: "btn btn-secondary" %>
+    </div>
+  <% end %>
+</div>
+
+<div class="navigation-links">
+  <%= link_to "← Back to User", user_path(@user), class: "nav-link" %>
+  <%= link_to "← Back to Users", users_path, class: "nav-link" %>
+  <%= link_to "← Back to Home", root_path, class: "nav-link" %>
+</div> 

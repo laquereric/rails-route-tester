@@ -1,0 +1,38 @@
+source "https://rubygems.org"
+
+ruby "3.2.0"
+
+# Rails framework
+gem "rails", "~> 7.0.0"
+gem "sqlite3", "~> 1.4"
+gem "puma", "~> 5.0"
+
+# Asset pipeline
+gem "sprockets-rails"
+gem "importmap-rails"
+gem "turbo-rails"
+gem "stimulus-rails"
+
+# View helpers
+gem "jbuilder"
+
+# Development and test gems
+group :development, :test do
+  gem "debug", platforms: %i[ mri mingw x64_mingw ]
+  gem "rspec-rails", "~> 6.0"
+  gem "capybara", "~> 3.0"
+  gem "selenium-webdriver", "~> 4.0"
+  gem "factory_bot_rails", "~> 6.0"
+  gem "faker", "~> 3.0"
+  gem "rails_route_tester", path: "../../"
+end
+
+group :development do
+  gem "web-console"
+  gem "error_highlight", platforms: [:ruby]
+end
+
+group :test do
+  gem "cucumber-rails", "~> 2.0", require: false
+  gem "database_cleaner-active_record", "~> 2.0"
+end 

@@ -1,0 +1,72 @@
+<div class="page-header">
+  <div class="header-content">
+    <h1>Users</h1>
+    <div class="header-actions">
+      <%= link_to "Add New User", new_user_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+</div>
+
+<div class="search-section">
+  <%= form_with url: users_path, method: :get, local: true, class: "search-form" do |form| %>
+    <div class="search-input-group">
+      <%= form.text_field :search, 
+          value: params[:search], 
+          placeholder: "Search users by name or email...",
+          class: "search-input" %>
+      <%= form.submit "Search", class: "btn btn-search" %>
+      <% if params[:search].present? %>
+        <%= link_to "Clear", users_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="users-section">
+  <% if @users.any? %>
+    <div class="users-grid">
+      <% @users.each do |user| %>
+        <div class="user-card">
+          <div class="user-avatar">
+            <img src="<%= user.avatar_url %>" alt="<%= user.name %>" />
+          </div>
+          <div class="user-info">
+            <h3><%= link_to user.name, user_path(user), class: "user-link" %></h3>
+            <p class="user-email"><%= user.email %></p>
+            <% if user.bio.present? %>
+              <p class="user-bio"><%= truncate(user.bio, length: 120) %></p>
+            <% end %>
+            <div class="user-actions">
+              <%= link_to "View", user_path(user), class: "btn btn-small btn-primary" %>
+              <%= link_to "Edit", edit_user_path(user), class: "btn btn-small btn-secondary" %>
+              <%= link_to "Delete", user_path(user), 
+                  method: :delete, 
+                  data: { confirm: "Are you sure you want to delete #{user.name}?" },
+                  class: "btn btn-small btn-danger" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="pagination-info">
+      <p>Showing <%= @users.count %> of <%= User.count %> users</p>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <div class="empty-icon">👥</div>
+      <h3>No users found</h3>
+      <% if params[:search].present? %>
+        <p>No users match your search for "<%= params[:search] %>".</p>
+        <%= link_to "Clear search", users_path, class: "btn btn-primary" %>
+      <% else %>
+        <p>Get started by creating your first user.</p>
+        <%= link_to "Create User", new_user_path, class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="navigation-links">
+  <%= link_to "← Back to Home", root_path, class: "nav-link" %>
+</div> 

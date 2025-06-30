@@ -1,0 +1,66 @@
+<div class="page-header">
+  <div class="header-content">
+    <h1><%= @user.name %></h1>
+    <div class="header-actions">
+      <%= link_to "Edit User", edit_user_path(@user), class: "btn btn-secondary" %>
+      <%= link_to "Delete User", user_path(@user), 
+          method: :delete, 
+          data: { confirm: "Are you sure you want to delete #{@user.name}?" },
+          class: "btn btn-danger" %>
+    </div>
+  </div>
+</div>
+
+<div class="user-profile">
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <img src="<%= @user.avatar_url %>" alt="<%= @user.name %>" />
+    </div>
+    <div class="profile-info">
+      <h2><%= @user.name %></h2>
+      <p class="profile-email"><%= @user.email %></p>
+      <p class="profile-joined">Joined <%= @user.created_at.strftime("%B %Y") %></p>
+    </div>
+  </div>
+
+  <% if @user.bio.present? %>
+    <div class="profile-section">
+      <h3>About</h3>
+      <div class="bio-content">
+        <p><%= @user.bio %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="profile-section">
+    <h3>Account Information</h3>
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Name:</span>
+        <span class="info-value"><%= @user.name %></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Email:</span>
+        <span class="info-value"><%= @user.email %></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Member Since:</span>
+        <span class="info-value"><%= @user.created_at.strftime("%B %d, %Y") %></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Last Updated:</span>
+        <span class="info-value"><%= @user.updated_at.strftime("%B %d, %Y") %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="profile-actions">
+    <%= link_to "Edit Profile", edit_user_path(@user), class: "btn btn-primary" %>
+    <%= link_to "View Profile", profile_user_path(@user), class: "btn btn-secondary" %>
+  </div>
+</div>
+
+<div class="navigation-links">
+  <%= link_to "← Back to Users", users_path, class: "nav-link" %>
+  <%= link_to "← Back to Home", root_path, class: "nav-link" %>
+</div> 

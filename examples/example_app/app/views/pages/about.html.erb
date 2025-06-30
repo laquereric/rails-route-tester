@@ -1,0 +1,60 @@
+<div class="page-header">
+  <div class="header-content">
+    <h1>About Us</h1>
+    <div class="header-actions">
+      <%= link_to "Contact Us", contact_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+</div>
+
+<div class="content-section">
+  <div class="about-intro">
+    <h2>Our Mission</h2>
+    <p>This example application demonstrates the powerful test capture functionality of the Rails Route Tester gem. We've built a comprehensive user management system that showcases how automated testing can capture every step of the user journey.</p>
+  </div>
+
+  <div class="team-section">
+    <h2>Our Team</h2>
+    <div class="team-grid">
+      <% @team_members.each do |member| %>
+        <div class="team-card">
+          <div class="team-avatar">
+            <img src="https://ui-avatars.com/api/?name=<%= CGI.escape(member[:name]) %>&size=100&background=random" alt="<%= member[:name] %>" />
+          </div>
+          <div class="team-info">
+            <h3><%= member[:name] %></h3>
+            <p class="team-role"><%= member[:role] %></p>
+            <p class="team-bio"><%= member[:bio] %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="features-highlight">
+    <h2>What This Demo Shows</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>📸 Test Capture</h3>
+        <p>Every test step automatically captures HTML and PNG files with metadata overlays.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🔗 Navigation Testing</h3>
+        <p>Complete user journey testing from home page through user management workflows.</p>
+      </div>
+      <div class="feature-card">
+        <h3>📊 Results Management</h3>
+        <p>Organized test results with automatic cleanup and comprehensive reporting tools.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🎨 Visual Documentation</h3>
+        <p>Create visual documentation of your application's user interface and interactions.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="navigation-links">
+  <%= link_to "← Back to Home", root_path, class: "nav-link" %>
+  <%= link_to "View Users", users_path, class: "nav-link" %>
+</div> 

@@ -1,0 +1,90 @@
+<div class="page-header">
+  <div class="header-content">
+    <h1>Contact Us</h1>
+    <div class="header-actions">
+      <%= link_to "About Us", about_path, class: "btn btn-secondary" %>
+    </div>
+  </div>
+</div>
+
+<div class="content-section">
+  <div class="contact-intro">
+    <h2>Get in Touch</h2>
+    <p>Have questions about the Rails Route Tester gem or this example application? We'd love to hear from you!</p>
+  </div>
+
+  <div class="contact-grid">
+    <div class="contact-info">
+      <h3>Contact Information</h3>
+      <div class="info-list">
+        <div class="info-item">
+          <span class="info-label">Email:</span>
+          <span class="info-value">
+            <a href="mailto:<%= @contact_info[:email] %>"><%= @contact_info[:email] %></a>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Phone:</span>
+          <span class="info-value">
+            <a href="tel:<%= @contact_info[:phone] %>"><%= @contact_info[:phone] %></a>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Address:</span>
+          <span class="info-value"><%= @contact_info[:address] %></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="contact-form">
+      <h3>Send us a Message</h3>
+      <form class="contact-form-fields">
+        <div class="form-group">
+          <label for="name" class="form-label">Name</label>
+          <input type="text" id="name" name="name" class="form-input" placeholder="Your name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" name="email" class="form-input" placeholder="Your email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="subject" class="form-label">Subject</label>
+          <input type="text" id="subject" name="subject" class="form-input" placeholder="What's this about?" required>
+        </div>
+
+        <div class="form-group">
+          <label for="message" class="form-label">Message</label>
+          <textarea id="message" name="message" rows="5" class="form-textarea" placeholder="Your message..." required></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Send Message</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="demo-info">
+    <h3>About This Demo</h3>
+    <p>This contact page is part of our example application that demonstrates the Rails Route Tester gem's test capture functionality. When you run tests on this application, you'll see how every page interaction is captured with HTML and PNG files.</p>
+    
+    <div class="demo-features">
+      <h4>Demo Features:</h4>
+      <ul>
+        <li>Complete user management system</li>
+        <li>Navigation between multiple pages</li>
+        <li>Form interactions and validation</li>
+        <li>Search functionality</li>
+        <li>Responsive design elements</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="navigation-links">
+  <%= link_to "← Back to Home", root_path, class: "nav-link" %>
+  <%= link_to "About Us", about_path, class: "nav-link" %>
+  <%= link_to "View Users", users_path, class: "nav-link" %>
+</div> 
