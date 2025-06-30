@@ -2,7 +2,7 @@ Gem::Specification.new do |spec|
   spec.name          = "rails_route_tester"
   spec.version       = "1.0.0"
   spec.authors       = ["Rails Route Tester Contributors"]
-  spec.email         = ["contributors@rails-route-tester.com"]
+  spec.email         = ["laquereric@gmail.com"]
 
   spec.summary       = "Rails gem for route testing and Page Object Model generation"
   spec.description   = "Provides Rake tasks to list routes, generate Page Object Models, and create RSpec/Cucumber tests for Rails applications"
